@@ -22,8 +22,12 @@ public class MovimientoJugador : MonoBehaviour
 
     SpriteRenderer spriteRenderer;
 
+    bool puedeSaltar = true;
+
     void Start()
     {
+
+
         moveAction = InputSystem.actions.FindAction("Move");
         jumpAction = InputSystem.actions.FindAction("Jump");
 
@@ -40,8 +44,8 @@ public class MovimientoJugador : MonoBehaviour
 
     void Update()
     {
-        moverse();
-        saltar();
+        Moverse();
+        Saltar();
 
         if (rigid2D.linearVelocityY > 0.1f)
         {
@@ -59,7 +63,7 @@ public class MovimientoJugador : MonoBehaviour
 
 
 
-    void moverse()
+    void Moverse()
     {
         Vector2 movimiento = moveAction.ReadValue<Vector2>();
 
@@ -69,19 +73,28 @@ public class MovimientoJugador : MonoBehaviour
         {
             spriteRenderer.flipX = true;
 
-        } else if (rigid2D.linearVelocityX > 0)
+        }
+        else if (rigid2D.linearVelocityX > 0)
         {
             spriteRenderer.flipX = false;
         }
 
     }
 
-    void saltar()
+    void Saltar()
     {
-
-        if (jumpAction.WasPressedThisFrame())
+        if (jumpAction.WasPressedThisFrame() && puedeSaltar)
         {
             rigid2D.linearVelocityY = velocidadSalto;
+            puedeSaltar = false;
+        }
+    }
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.gameObject.CompareTag("Suelo"))
+        {
+            puedeSaltar = true;
         }
     }
 }
