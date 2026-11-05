@@ -5,7 +5,6 @@ using UnityEngine.InputSystem;
 
 public class MovimientoJugador : MonoBehaviour
 {
-
     Animator animator;
     InputAction moveAction;
     InputAction jumpAction;
@@ -24,9 +23,14 @@ public class MovimientoJugador : MonoBehaviour
 
     bool puedeSaltar = true;
 
+    bool muerto = false;
+    Vector2 posicionInicial;
+    float tiempo = 0;
+
     void Start()
     {
 
+        posicionInicial = transform.position;
 
         moveAction = InputSystem.actions.FindAction("Move");
         jumpAction = InputSystem.actions.FindAction("Jump");
@@ -37,28 +41,42 @@ public class MovimientoJugador : MonoBehaviour
         spriteRenderer = GetComponent<SpriteRenderer>();
 
         animator.SetInteger("estado", 0);
-
     }
 
 
 
     void Update()
     {
+        if (muerto == true)
+        {
+            if (animator.GetInteger("estado") == 0)
+            {
+                transform.position = posicionInicial;
+                rigid2D.linearVelocity = Vector2.zero;
+                muerto = false;
+            }
+
+            return;
+        }
+
+
         Moverse();
         Saltar();
 
         if (rigid2D.linearVelocityY > 0.1f)
         {
-            animator.SetInteger("estado", 2);
+            estadoAnimacion = 2;
         }
         else if (Mathf.Abs(rigid2D.linearVelocityX) > 0.1f)
         {
-            animator.SetInteger("estado", 1);
+            estadoAnimacion = 1;
         }
         else
         {
-            animator.SetInteger("estado", 0);
+            estadoAnimacion = 0;
         }
+
+        animator.SetInteger("estado", estadoAnimacion);
     }
 
 
@@ -95,6 +113,24 @@ public class MovimientoJugador : MonoBehaviour
         if (collision.gameObject.CompareTag("Suelo"))
         {
             puedeSaltar = true;
+        }
+    }
+
+    void morir()
+    {
+        muerto = true;
+
+        rigid2D.linearVelocity = Vector2.zero;
+
+        estadoAnimacion = 3;
+        animator.SetInteger("estado", estadoAnimacion);
+    }
+
+    private void OnTriggerEnter2D(Collider2D collision)
+    {
+        if (collision.CompareTag("Peligro") && muerto == false)
+        {
+            morir();
         }
     }
 }
