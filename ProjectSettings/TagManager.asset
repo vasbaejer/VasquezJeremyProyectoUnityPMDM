@@ -6,11 +6,14 @@ TagManager:
   tags:
   - Suelo
   - Peligro
+  - Trampa
+  - Meta
+  - Fruta
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - Suelo
   - Water
   - UI
   - 
